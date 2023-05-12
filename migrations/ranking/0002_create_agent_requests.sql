@@ -1,6 +1,6 @@
 create table agent_requests
 (
-    id                   serial,
+    id                   serial primary key,
     RequestID            int,
     EmployeeId           int,
     RequestDate          timestamp,

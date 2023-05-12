@@ -1,5 +1,5 @@
 create table client_requests (
-  id serial,
+  id serial primary key,
   RequestID int,
   RequestDate timestamp,
   ClientID int,
