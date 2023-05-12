@@ -1,0 +1,2 @@
+RequestID,RequestDate,ClientID,ClientGrade,SearchRoute,RequestDepartureDate,RequestReturnDate,FligtOption,DepartureDate,ArrivaDate,ReturnDepatrureDate,ReturnArrivalDate,SegmentCount,Amount,class,IsBaggage,isRefundPermitted,isExchangePermitted,isDiscount,InTravelPolicy,FrequentFlyer,SelectedVariant
+4178519,2022-06-01 09:55:44.810,24604,NULL,MOWSVX,2022-06-15 00:00:00.000,NULL,SU6907 SVOSVX 2022.06.15,2022-06-15 14:05:00.000,2022-06-15 18:35:00.000,NULL,NULL,1,3925.00,E,0,NULL,NULL,1,1,NULL,0
