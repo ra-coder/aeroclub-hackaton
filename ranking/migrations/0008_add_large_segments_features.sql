@@ -39,6 +39,7 @@ create table agent_requests_features
     has_intravelpolicy_variant_1_segment bool,
     min_price                            decimal(16, 2),
     price_diff                           decimal(16, 2),
+    price_ratio                          float,
     has_not_economy_in_policy            bool,
     min_return_time                      int,
     return_time                          int,
@@ -56,7 +57,7 @@ create table agent_requests_features
 create index on agent_requests_features (id);
 
 insert into agent_requests_features (id, request_id, has_intravelpolicy_variant, has_intravelpolicy_variant_1_segment,
-                                     min_price, price_diff, has_not_economy_in_policy, min_return_time, return_time,
+                                     min_price, price_diff, price_ratio, has_not_economy_in_policy, min_return_time, return_time,
                                      min_to_time, to_time, min_departure_diff_seconds, departure_diff_seconds,
                                      client_has_travellergrade, client_travellergrade, class_is_economy,
                                      class_is_business, min_segments_count, segments_diff)
@@ -66,6 +67,7 @@ select id,
        has_intravelpolicy_variant_1_segment,
        min_price,
        amount - min_price,
+       amount::float / NULLIF(min_price::float,0) as price_ratio,
        has_not_economy_in_policy,
        min_return_time,
        extract(epoch from (returnarrivaldate - returndepatruredate)) as return_time,

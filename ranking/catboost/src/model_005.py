@@ -12,8 +12,8 @@ from sqlalchemy.sql import insert
 from ranking.catboost.src.lib import AbstractTrainFlow, PreparedResult
 
 
-class NaiveCatboostTrainFlow4(AbstractTrainFlow):
-    model_name = 'model_004_catboost_add_many_segments_features'
+class NaiveCatboostTrainFlow5(AbstractTrainFlow):
+    model_name = 'model_005'
 
     def prepare_features(self, limit: int | None = None, filter_for_test: bool = False) -> PreparedResult:
         if filter_for_test:
@@ -61,6 +61,7 @@ class NaiveCatboostTrainFlow4(AbstractTrainFlow):
             'amount',
             'min_price',
             'price_diff',
+            'price_ratio',
             'min_return_time',
             'return_time',
             'min_to_time',
@@ -106,7 +107,7 @@ class NaiveCatboostTrainFlow4(AbstractTrainFlow):
         pred = model.predict(X_test)
         bool_result = list(map(lambda rec: rec == 'True', pred))
         print(classification_report(y_test, bool_result))
-
+        print(model.get_feature_importance(prettified=True))
 
     def save_model(self):
         assert self.model is not None

@@ -10,6 +10,6 @@ select
 
 from agent_requests
 join agent_requests_sample_001 sample on agent_requests.id = sample.id
-join model_003_catboost_add_class_features predict on predict.id = agent_requests.id
+join model_004_catboost_add_many_segments_features predict on predict.id = agent_requests.id
 group by requestid
 order by sentoption_miss desc ;
