@@ -10,4 +10,4 @@ select
 
 from agent_requests
 join agent_requests_sample_001 sample on agent_requests.id = sample.id
-join model_002_catboost_with_request_features predict on predict.id = agent_requests.id
+join model_003_catboost_add_class_features predict on predict.id = agent_requests.id

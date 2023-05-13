@@ -3,7 +3,7 @@ import logging
 import sshtunnel
 from sqlalchemy import create_engine
 
-from model_002_add_features_catboost import NaiveCatboostTrainFlow2
+from model_003_add_class_features_catboost import NaiveCatboostTrainFlow3
 
 logging.getLogger().setLevel(logging.INFO)
 
@@ -19,7 +19,7 @@ if __name__ == '__main__':
         engine = create_engine(f'postgresql://coder:coder@localhost:{server.local_bind_port}/ranking')
         logging.info('START')
 
-        train_flow = NaiveCatboostTrainFlow2(db_engine=engine, sampling_table_name='agent_requests_sample_001')
+        train_flow = NaiveCatboostTrainFlow3(db_engine=engine, sampling_table_name='agent_requests_sample_001')
         data = train_flow.prepare_features(filter_for_test=True)  #, limit=10000)
         train_flow.learn(data)
         train_flow.save_model()
