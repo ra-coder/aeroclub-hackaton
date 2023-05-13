@@ -20,7 +20,7 @@ if __name__ == '__main__':
         logging.info('START')
 
         train_flow = NaiveCatboostTrainFlow(db_engine=engine, sampling_table_name='agent_requests_sample_001')
-        data = train_flow.prepare_features(filter_for_test=True)  # limit=10000)
+        data = train_flow.prepare_features(filter_for_test=True)  #, limit=10000)
         train_flow.learn(data)
         train_flow.save_model()
         # train_flow.load_model()

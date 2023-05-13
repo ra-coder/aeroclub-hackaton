@@ -4,6 +4,7 @@ import re
 import pandas as pd
 from catboost import CatBoostClassifier
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import classification_report
 from sqlalchemy import Boolean, Column, Integer, text
 from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy.sql import insert
@@ -68,10 +69,14 @@ class NaiveCatboostTrainFlow(AbstractTrainFlow):
             random_state=41,
         )
         # Prepare model
-        model = CatBoostClassifier(iterations=50, eval_metric='Accuracy', verbose=True)
+        model = CatBoostClassifier(iterations=500, eval_metric='Logloss', verbose=True)
         # Fit model
         model.fit(X_train, y_train, eval_set=(X_test, y_test))
         self.model = model
+        pred = model.predict(X_test)
+        bool_result = list(map(lambda rec: rec == 'True', pred))
+        print(classification_report(y_test, bool_result))
+
 
     def save_model(self):
         assert self.model is not None
