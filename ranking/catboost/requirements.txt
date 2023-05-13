@@ -68,6 +68,8 @@ six==1.16.0
     # via
     #   catboost
     #   python-dateutil
+sklearn==0.0.post5
+    # via -r requirements.in
 sqlalchemy[asyncio]==2.0.13
     # via -r requirements.in
 sshtunnel==0.4.0
