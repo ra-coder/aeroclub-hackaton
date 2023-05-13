@@ -1,5 +1,5 @@
-drop table if exists postprocess_model_005;
-create table postprocess_model_005
+drop table if exists postprocess_model_006;
+create table postprocess_model_006
 (
     id            int primary key references agent_requests,
     request_id    int,
@@ -9,9 +9,9 @@ create table postprocess_model_005
     fixed_predict bool,
     sentoption    bool
 );
-create index on postprocess_model_005 (id);
+create index on postprocess_model_006 (id);
 
-insert into postprocess_model_005 (id, request_id, predict, score, rank, fixed_predict, sentoption)
+insert into postprocess_model_006 (id, request_id, predict, score, rank, fixed_predict, sentoption)
 SELECT agent_requests.id,
        requestid,
        predict,
@@ -23,10 +23,10 @@ SELECT agent_requests.id,
        predict or (rank() OVER (
            PARTITION BY requestid
            ORDER BY score DESC
-           ) < 5) as fixed_predict,
+           ) < 6) as fixed_predict,
        sentoption
 from agent_requests
-         join model_005 predict on predict.id = agent_requests.id;
+         join model_006_airport_features predict on predict.id = agent_requests.id;
 
 select count(*) filter ( where sentoption = True and fixed_predict = False)                      as sentoption_miss,
        count(*) filter ( where fixed_predict = True and sentoption = True )                      as positive_success_count,
@@ -40,8 +40,8 @@ select count(*) filter ( where sentoption = True and fixed_predict = False)     
        count(*) filter ( where fixed_predict = True and for_test = True)                         as positive_count_in_test,
        count(*) filter ( where for_test = True )                                                 as all_test_size,
        count(distinct sample.request_id) filter ( where for_test = True )                        as all_test_requests
-from postprocess_model_005
-         join agent_requests_sample_001 sample on postprocess_model_005.id = sample.id
+from postprocess_model_006
+         join agent_requests_sample_001 sample on postprocess_model_006.id = sample.id;
 
 
 
@@ -57,8 +57,8 @@ with _tmp as (select 'accuracy' as class,
                      null       as recall,
                      null       as f1_score,
                      count(*)   as support
-              from postprocess_model_005
-                       join agent_requests_sample_001 sample on postprocess_model_005.id = sample.id and for_test = True
+              from postprocess_model_006
+                       join agent_requests_sample_001 sample on postprocess_model_006.id = sample.id and for_test = True
               UNION
               select 'True'                                                          as class,
                      (count(*) filter ( where fixed_predict = True and sentoption = True ))::numeric(12, 6)
@@ -73,8 +73,8 @@ with _tmp as (select 'accuracy' as class,
                          )::numeric(12, 6)                                           as recall,
                      null                                                            as f1_score,
                      count(*) filter ( where fixed_predict = True)                   as support
-              from postprocess_model_005
-                       join agent_requests_sample_001 sample on postprocess_model_005.id = sample.id and for_test = True
+              from postprocess_model_006
+                       join agent_requests_sample_001 sample on postprocess_model_006.id = sample.id and for_test = True
               UNION
               select 'False'                                                          as class,
                      (count(*) filter ( where fixed_predict = FALSE and sentoption = FALSE ))::numeric(12, 6)
@@ -89,9 +89,9 @@ with _tmp as (select 'accuracy' as class,
                          )::numeric(12, 6)                                            as recall,
                      null                                                             as f1_score,
                      count(*) filter ( where fixed_predict = FALSE)                   as support
-              from postprocess_model_005
+              from postprocess_model_006
                        join agent_requests_sample_001 sample
-                            on postprocess_model_005.id = sample.id and for_test = True)
+                            on postprocess_model_006.id = sample.id and for_test = True)
 select "class",
        pricission::numeric(12, 3),
        recall::numeric(12, 3),
@@ -99,3 +99,7 @@ select "class",
        support
 from _tmp
 order by support;
+
+
+-- sentoption_count,positive_count,sentoption_miss_test,positive_success_count_in_test,sentoption_count_in_test,positive_count_in_test,all_test_size,all_test_requests
+-- 25008,39360,694,1157,1851,3016,41764,774
