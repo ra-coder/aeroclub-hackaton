@@ -50,7 +50,7 @@ if __name__ == '__main__':
     ) as server:
         engine = create_engine(f'postgresql://coder:coder@localhost:{server.local_bind_port}/ranking')
         logging.info('START')
-        train_data = pd.read_sql("SELECT * FROM agent_requests LIMIT 300000;", engine)
+        train_data = pd.read_sql("SELECT * FROM agent_requests; -- LIMIT 300000;", engine)
         logging.info('READ DONE')
         prepared_data, target, predictors = prepare_simple_train(train_data)
         logging.info('PREPARE DONE')
@@ -59,7 +59,7 @@ if __name__ == '__main__':
         model.save_model("model_1_naive")
 
 
-# bestTest = 0.9845
-# bestIteration = 0
+# bestTest = 0.9619864921
+# bestIteration = 29
 #
-# Shrink model to first 1 iterations.
+# Shrink model to first 30 iterations.
