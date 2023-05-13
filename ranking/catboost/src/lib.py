@@ -24,8 +24,9 @@ class PreparedResult:
 class AbstractTrainFlow:
     model_name: str
 
-    def __init__(self, db_engine: Engine):
+    def __init__(self, db_engine: Engine, sampling_table_name: str | None = None):
         self.db_engine: Engine = db_engine
+        self.sampling_table_name = sampling_table_name
         self.model = None
 
     def prepare_features(self, limit: int | None = None) -> PreparedResult:
@@ -46,5 +47,8 @@ class AbstractTrainFlow:
     def load_model(self):
         raise NotImplementedError
 
-    def apply_model_in_db(self, res_table_name: str = 'test_scored'):
+    def apply_model(self, prepared_data: PreparedResult):
+        raise NotImplementedError
+
+    def apply_model_in_db(self):
         raise NotImplementedError
