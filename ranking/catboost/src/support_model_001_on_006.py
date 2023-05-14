@@ -176,3 +176,47 @@ class SupportModelCatboost1(AbstractTrainFlow):
                 logging.info('saved chunk %r', chunk)
             session.commit()
             logging.info('saved to db finished')
+
+"""
+bestTest = 0.06198875159
+bestIteration = 249
+
+              precision    recall  f1-score   support
+
+       False       0.98      0.99      0.99     94272
+        True       0.86      0.68      0.76      4928
+
+    accuracy                           0.98     99200
+   macro avg       0.92      0.84      0.87     99200
+weighted avg       0.98      0.98      0.98     99200
+
+                              Feature Id  Importances
+0                 departure_diff_seconds    16.848961
+1                                to_time    13.973340
+2                            min_to_time    11.176264
+3                          to_time_ratio    10.275063
+4             min_departure_diff_seconds     6.236766
+5                             price_diff     6.203395
+6                            return_time     5.653207
+7                              isbaggage     4.602111
+8                             isdiscount     4.585267
+9                            price_ratio     4.246117
+10                     return_time_ratio     3.691959
+11                             min_price     3.078931
+12                       min_return_time     2.421390
+13                                amount     2.127515
+14                          segmentcount     1.862511
+15                    min_segments_count     0.914092
+16                         segments_diff     0.682945
+17                        intravelpolicy     0.679621
+18             has_not_economy_in_policy     0.188877
+19            has_intravelpolicy_variant     0.182994
+20                      class_is_economy     0.117120
+21  has_intravelpolicy_variant_1_segment     0.098533
+22                   isexchangepermitted     0.070700
+23                     isrefundpermitted     0.046172
+24                            round_trip     0.036149
+25                 client_travellergrade     0.000000
+26             client_has_travellergrade     0.000000
+27                     class_is_business     0.000000
+"""

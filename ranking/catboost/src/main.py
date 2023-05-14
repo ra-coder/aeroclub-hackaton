@@ -32,6 +32,7 @@ def learn_on_client_requests():
     support_train_flow = SupportTrainFlow(db_engine=engine)
     data = support_train_flow.prepare_features(table_prefix='client')  # , limit=30000)
     support_train_flow.learn(data)
+
     support_train_flow.save_model()
     # train_flow.load_model()
     support_train_flow.apply_model_in_db(to_client=False)
