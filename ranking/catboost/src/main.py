@@ -3,9 +3,9 @@ import logging
 import sshtunnel
 from sqlalchemy import create_engine
 
-from model_006 import NaiveCatboostTrainFlow6 as PrevTrainFlow
-from support_model_001_on_006 import SupportModelCatboost1 as SupportTrainFlow
-from model_007_with_support_score import CatBoostWithSupportScoresTrainFlow7 as TrainFlow
+from model_008_new_time_features_no_support import CatboostTrainFlow8 as PrevTrainFlow
+from support_model_002_on_008 import SupportModelCatboost2 as SupportTrainFlow
+from model_009_with_support_score import CatBoostWithSupportScoresTrainFlow9 as TrainFlow
 logging.getLogger().setLevel(logging.INFO)
 
 
@@ -23,19 +23,20 @@ def learn_on_agent_requests():
 
 
 def learn_on_client_requests():
-    prev_train_flow = PrevTrainFlow(db_engine=engine, sampling_table_name='agent_requests_sample_001')
-    prev_train_flow.load_model()
-    prev_train_flow.apply_model_in_db(to_client=True)
+    # prev_train_flow = PrevTrainFlow(db_engine=engine, sampling_table_name='agent_requests_sample_001')
+    # prev_train_flow.load_model()
+    # prev_train_flow.apply_model_in_db(to_client=True)
 
-    # Some sQL from  0012_learn_on_extended_client_requests.sql TODO move to code
+    # Some sQL from 0014_models_009_and_support_002.sql TODO move to code
 
     support_train_flow = SupportTrainFlow(db_engine=engine)
     data = support_train_flow.prepare_features(table_prefix='client')  # , limit=30000)
     support_train_flow.learn(data)
-
     support_train_flow.save_model()
     # train_flow.load_model()
     support_train_flow.apply_model_in_db(to_client=False)
+
+    # Some sQL from  0012_count_support_model_rank.sql TODO move to code
 
 
 if __name__ == '__main__':

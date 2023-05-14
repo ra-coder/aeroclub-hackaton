@@ -26,7 +26,7 @@ SELECT agent_requests.id,
            ) < 6) as fixed_predict,
        sentoption
 from agent_requests
-         join model_007_support_scores predict on predict.id = agent_requests.id;
+         join model_009_support_scores predict on predict.id = agent_requests.id;
 
 select count(*) filter ( where sentoption = True and fixed_predict = False)                      as sentoption_miss,
        count(*) filter ( where fixed_predict = True and sentoption = True )                      as positive_success_count,
