@@ -12,8 +12,8 @@ from sqlalchemy.sql import insert
 from ranking.catboost.src.lib import AbstractTrainFlow, PreparedResult
 
 
-class NaiveCatboostTrainFlow6(AbstractTrainFlow):
-    model_name = 'model_006_airport_features'
+class SupportModelCatboost1(AbstractTrainFlow):
+    model_name = 'support_model_001_on_006'
 
     def prepare_features(
             self,
@@ -112,7 +112,7 @@ class NaiveCatboostTrainFlow6(AbstractTrainFlow):
             random_state=41,
         )
         # Prepare model
-        model = CatBoostClassifier(iterations=600, eval_metric='Logloss', verbose=True)
+        model = CatBoostClassifier(iterations=250, eval_metric='Logloss', verbose=True)
         # Fit model
         model.fit(X_train, y_train, eval_set=(X_test, y_test))
         self.model = model
