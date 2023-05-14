@@ -23,7 +23,7 @@ SELECT agent_requests.id,
        (rank() OVER (
            PARTITION BY requestid
            ORDER BY score DESC
-           ) < 10) as fixed_predict,
+           ) < 4) as fixed_predict,
        sentoption
 from agent_requests
          join model_009_support_scores predict on predict.id = agent_requests.id;
