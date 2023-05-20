@@ -5,7 +5,7 @@ from sqlalchemy import create_engine
 
 from model_008_new_time_features_no_support import CatboostTrainFlow8 as PrevTrainFlow
 from support_model_002_on_008 import SupportModelCatboost2 as SupportTrainFlow
-from model_009_with_support_score import CatBoostWithSupportScoresTrainFlow9 as TrainFlow
+from model_010_add_days_request_befor_flight import CatboostTrainFlow10 as TrainFlow
 logging.getLogger().setLevel(logging.INFO)
 
 
@@ -43,7 +43,7 @@ if __name__ == '__main__':
     with sshtunnel.open_tunnel(
             ('84.252.142.119', 22),
             ssh_username="ra-coder",
-            ssh_pkey="../../../.ssh/ra-coder_ed.ppk",
+            ssh_pkey="ra-coder_ed.ppk",
             remote_bind_address=('localhost', 5432),
             local_bind_address=('localhost', 5432)
     ) as server:

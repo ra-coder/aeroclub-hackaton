@@ -9,11 +9,11 @@ from sqlalchemy import Boolean, Column, Float, Integer, text
 from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy.sql import insert
 
-from lib import AbstractTrainFlow, PreparedResult
+from ranking.catboost.src.lib import AbstractTrainFlow, PreparedResult
 
 
-class SupportModelCatboost2(AbstractTrainFlow):
-    model_name = 'support_model_002_on_008'
+class CatboostTrainFlow10(AbstractTrainFlow):
+    model_name = 'model_010'
 
     def prepare_features(
             self,
@@ -82,6 +82,14 @@ class SupportModelCatboost2(AbstractTrainFlow):
             'client_travellergrade',
             'min_segments_count',
             'segments_diff',
+            'departure_hour',
+            'arrival_hour',
+            'return_departure_hour',
+            'return_arrival_hour',
+            'total_flight_time',
+            'min_total_flight_time',
+            'total_flight_ratio',
+            'days_request_before_flight',
         ]
         bool_features = [
             'isbaggage',
@@ -91,18 +99,12 @@ class SupportModelCatboost2(AbstractTrainFlow):
             'intravelpolicy',
             'has_intravelpolicy_variant',
             'has_intravelpolicy_variant_1_segment',
+            'has_intravelpolicy_variant_2_segment',
             'has_not_economy_in_policy',
             'client_has_travellergrade',
             'class_is_economy',
             'class_is_business',
             'round_trip',
-            'departure_hour',
-            'arrival_hour',
-            'return_departure_hour',
-            'return_arrival_hour',
-            'total_flight_time',
-            'min_total_flight_time',
-            'total_flight_ratio',
         ]
         used = target + num_features + bool_features + exclude_but_keep
         predictors = num_features + bool_features
@@ -119,7 +121,7 @@ class SupportModelCatboost2(AbstractTrainFlow):
             random_state=41,
         )
         # Prepare model
-        model = CatBoostClassifier(iterations=250, eval_metric='Logloss', verbose=True)
+        model = CatBoostClassifier(iterations=900, eval_metric='Logloss', verbose=True)
         # Fit model
         model.fit(X_train, y_train, eval_set=(X_test, y_test))
         self.model = model
@@ -185,52 +187,63 @@ class SupportModelCatboost2(AbstractTrainFlow):
             logging.info('saved to db finished')
 
 """
-bestTest = 0.05996692535
-bestIteration = 249
+bestTest = 0.09059620684
+bestIteration = 888
 
+Shrink model to first 889 iterations.
               precision    recall  f1-score   support
 
-       False       0.98      0.99      0.99     94674
-        True       0.85      0.64      0.73      4526
+       False       0.97      1.00      0.98     57327
+        True       0.72      0.24      0.35      2237
 
-    accuracy                           0.98     99200
-   macro avg       0.92      0.82      0.86     99200
-weighted avg       0.98      0.98      0.98     99200
+    accuracy                           0.97     59564
+   macro avg       0.84      0.62      0.67     59564
+weighted avg       0.96      0.97      0.96     59564
 
                               Feature Id  Importances
-0                 departure_diff_seconds    13.571068
-1                                to_time    12.087714
-2                          to_time_ratio     7.954357
-3                             isdiscount     5.305056
-4                            price_ratio     5.067640
-5             min_departure_diff_seconds     5.032915
-6                             price_diff     4.999035
-7                            return_time     4.771045
-8                              isbaggage     4.457416
-9                         departure_hour     3.952478
-10                           min_to_time     3.458504
-11                     total_flight_time     3.263926
-12                          segmentcount     3.181491
-13                       min_return_time     2.877707
-14                   return_arrival_hour     2.717480
-15                    total_flight_ratio     2.695717
-16                     return_time_ratio     2.413172
-17                 min_total_flight_time     2.399896
-18                 return_departure_hour     2.395495
-19                          arrival_hour     2.073850
-20                             min_price     2.000511
-21                                amount     1.904831
-22                            round_trip     0.673649
-23                        intravelpolicy     0.447052
-24  has_intravelpolicy_variant_1_segment     0.155357
-25             has_not_economy_in_policy     0.087827
-26                     isrefundpermitted     0.029301
-27                         segments_diff     0.023226
-28                    min_segments_count     0.002285
-29                 client_travellergrade     0.000000
-30                   isexchangepermitted     0.000000
-31            has_intravelpolicy_variant     0.000000
-32             client_has_travellergrade     0.000000
-33                      class_is_economy     0.000000
-34                     class_is_business     0.000000
+0                          to_time_ratio    11.390871
+1                                to_time    11.305278
+2                      total_flight_time     6.300172
+3                            price_ratio     5.261784
+4                              min_price     5.156099
+5                            return_time     5.150535
+6                     total_flight_ratio     4.802802
+7                          segments_diff     4.491365
+8                            min_to_time     4.030753
+9             min_departure_diff_seconds     4.004905
+10                            price_diff     3.796910
+11                departure_diff_seconds     3.709976
+12                          segmentcount     3.626596
+13                     return_time_ratio     3.532894
+14            days_request_before_flight     3.488018
+15                                amount     3.447406
+16                 min_total_flight_time     2.950762
+17                 return_departure_hour     1.866983
+18                            isdiscount     1.499417
+19                            round_trip     1.282178
+20                        departure_hour     1.219160
+21                          arrival_hour     1.213957
+22                       min_return_time     1.136948
+23                    min_segments_count     1.092689
+24                      class_is_economy     0.893329
+25                   return_arrival_hour     0.707656
+26                             isbaggage     0.628681
+27                     class_is_business     0.484545
+28             has_not_economy_in_policy     0.417904
+29  has_intravelpolicy_variant_2_segment     0.286929
+30                        intravelpolicy     0.282837
+31                     isrefundpermitted     0.186470
+32            has_intravelpolicy_variant     0.110184
+33                 client_travellergrade     0.097253
+34                   isexchangepermitted     0.079061
+35  has_intravelpolicy_variant_1_segment     0.035193
+36             client_has_travellergrade     0.031501
+INFO:root:result table created
+
+sentoption_miss_test,positive_success_count_in_test,sentoption_count_in_test,positive_count_in_test
+866,985,1851,2271
+
+sentoption_miss,positive_success_count,sentoption_count,positive_count
+10621,14387,25008,29719
+
 """

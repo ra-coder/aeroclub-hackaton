@@ -1,5 +1,5 @@
-drop table if exists postprocess_model_009;
-create table postprocess_model_009
+drop table if exists postprocess_model_010;
+create table postprocess_model_010
 (
     id            int primary key references agent_requests,
     request_id    int,
@@ -9,9 +9,9 @@ create table postprocess_model_009
     fixed_predict bool,
     sentoption    bool
 );
-create index on postprocess_model_009 (id);
+create index on postprocess_model_010 (id);
 
-insert into postprocess_model_009 (id, request_id, predict, score, rank, fixed_predict, sentoption)
+insert into postprocess_model_010 (id, request_id, predict, score, rank, fixed_predict, sentoption)
 SELECT agent_requests.id,
        requestid,
        predict,
@@ -26,7 +26,7 @@ SELECT agent_requests.id,
            ) < 4) as fixed_predict,
        sentoption
 from agent_requests
-         join model_009_support_scores predict on predict.id = agent_requests.id;
+         join model_010 predict on predict.id = agent_requests.id;
 
 select count(*)
        filter ( where sentoption = True and fixed_predict = False and for_test = True )          as sentoption_miss_test,
@@ -40,8 +40,8 @@ select count(*)
        count(*) filter ( where fixed_predict = True and sentoption = True )                      as positive_success_count,
        count(*) filter ( where sentoption = True )                                               as sentoption_count,
        count(*) filter ( where fixed_predict = True)                                             as positive_count
-from postprocess_model_009
-         join agent_requests_sample_001 sample on postprocess_model_009.id = sample.id;
+from postprocess_model_010
+         join agent_requests_sample_001 sample on postprocess_model_010.id = sample.id;
 
 
 
