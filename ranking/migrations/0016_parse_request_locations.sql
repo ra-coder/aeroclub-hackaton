@@ -52,3 +52,33 @@ group by id, request_id, flightoption_end_iata, flightoption_start_iata,
          return_departure_iata,
          return_arrival_iata;
 -- 637,402 rows affected in 39 s 477 ms
+
+select first_flight_option_operator_code, count(distinct request_id) as cnt
+from agent_request_parsed_info group by first_flight_option_operator_code order by cnt desc;
+
+
+
+select to_departure_iata, count(distinct request_id) as cnt
+from agent_request_parsed_info group by to_departure_iata order by cnt desc;
+-- MOW
+-- LED
+-- IST
+-- KJA
+-- ALA
+-- AER
+-- VVO
+-- SVO
+-- IKT
+-- DXB
+-- GOJ
+-- NQZ
+-- SVX
+-- KUF
+-- OVB
+-- TAS
+-- EVN
+-- UUS
+-- KGD
+-- KZN
+-- VKO
+-- TLV

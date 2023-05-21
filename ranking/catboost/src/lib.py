@@ -7,10 +7,17 @@ logging.getLogger().setLevel(logging.INFO)
 
 
 class PreparedResult:
-    def __init__(self, data: pd.DataFrame, target_column: list[str], features_columns: list[str]):
+    def __init__(
+            self,
+            data: pd.DataFrame,
+            target_column: list[str],
+            features_columns: list[str],
+            text_features: list[str] | None = None,
+    ):
         self.data: pd.DataFrame = data
         self.target_column: list[str] = target_column
         self.features_columns: list[str] = features_columns
+        self.text_features: list[str] = text_features or []
 
     @property
     def features_frame(self):

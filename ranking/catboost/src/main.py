@@ -3,16 +3,16 @@ import logging
 import sshtunnel
 from sqlalchemy import create_engine
 
-from model_008_new_time_features_no_support import CatboostTrainFlow8 as PrevTrainFlow
+from model_011_text_parsed_features import CatboostTrainFlow11 as PrevTrainFlow
 from support_model_002_on_008 import SupportModelCatboost2 as SupportTrainFlow
-from model_009_with_support_score import CatBoostWithSupportScoresTrainFlow9 as TrainFlow
+from model_011_text_parsed_features import CatboostTrainFlow11 as TrainFlow
 logging.getLogger().setLevel(logging.INFO)
 
 
 def learn_on_agent_requests():
     train_flow = TrainFlow(db_engine=engine, sampling_table_name='agent_requests_sample_001')
 
-    # data = train_flow.prepare_features(filter_for_test=True, limit=10000)
+    # data = train_flow.prepare_features(filter_for_test=True, limit=50000)
     # train_flow.learn(data)
 
     data = train_flow.prepare_features(filter_for_test=True)
