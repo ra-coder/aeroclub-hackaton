@@ -9,7 +9,7 @@ select
 --     count(*) filter ( where sentoption=True and for_test=True) as sentoption_count_in_test,
 --     count(*) filter ( where predict =True and for_test=True) as positive_count_in_test
 
-from postprocess_model_009 postpocess
+from postprocess_model_012 postpocess
 join agent_requests ar on postpocess.id = ar.id
 join agent_requests_sample_001 a on ar.id = a.id
 group by for_test

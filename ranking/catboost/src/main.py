@@ -3,9 +3,9 @@ import logging
 import sshtunnel
 from sqlalchemy import create_engine
 
-from model_012_fix_dates_by_timzone import CatboostTrainFlow12 as PrevTrainFlow
+from model_013_more_days_features import CatboostTrainFlow13 as PrevTrainFlow
 from support_model_002_on_008 import SupportModelCatboost2 as SupportTrainFlow
-from model_012_fix_dates_by_timzone import CatboostTrainFlow12 as TrainFlow
+from model_013_more_days_features import CatboostTrainFlow13 as TrainFlow
 logging.getLogger().setLevel(logging.INFO)
 
 
