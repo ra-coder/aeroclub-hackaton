@@ -110,6 +110,11 @@ select "class",
 from _tmp
 order by support;
 
+-- class,pricission,recall,f1_score,support
+-- True,0.454,0.556,0.500,2265
+-- False,0.979,0.969,0.974,39499
+-- accuracy,,,,41764
+
 
 -- sentoption_count,positive_count,sentoption_miss_test,positive_success_count_in_test,sentoption_count_in_test,positive_count_in_test,all_test_size,all_test_requests
 -- 25008,39360,694,1157,1851,3016,41764,774
