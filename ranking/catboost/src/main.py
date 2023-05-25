@@ -39,6 +39,18 @@ def learn_on_client_requests():
     # Some sQL from  0012_count_support_model_rank.sql TODO move to code
 
 
+def apply_to_final_test_requests():
+    # support_train_flow = SupportTrainFlow(db_engine=engine)
+    # support_train_flow.load_model()
+    # support_train_flow.apply_model_in_db(to_final_test=True)
+
+    # Some sQL from  0027_add_support_model_score.sql TODO move to code
+
+    train_flow = TrainFlow(db_engine=engine)
+    train_flow.load_model()
+    train_flow.apply_model_in_db(to_final_test=True)
+
+
 if __name__ == '__main__':
     with sshtunnel.open_tunnel(
             ('84.252.142.119', 22),
@@ -52,4 +64,6 @@ if __name__ == '__main__':
 
         # learn_on_client_requests()
 
-        learn_on_agent_requests()
+        # learn_on_agent_requests()
+
+        apply_to_final_test_requests()

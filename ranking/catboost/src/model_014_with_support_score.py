@@ -16,13 +16,15 @@ class CatboostTrainFlow14(AbstractTrainFlow):
     model_name = 'model_014'
     support_model_scores_table = 'preprocess_scores_support_model_003_on_013'
 
-
     def prepare_features(
             self,
             limit: int | None = None,
             filter_for_test: bool = False,
             table_prefix: str = 'agent',
     ) -> PreparedResult:
+        support_model_table_suffix = '_final_test' if table_prefix == 'final_test' else ''
+        support_model_scores_table = self.support_model_scores_table + support_model_table_suffix
+        logging.info(support_model_scores_table)
         if filter_for_test:
             assert isinstance(self.sampling_table_name, str)
             assert re.match("^[a-z0-9_]*$", self.sampling_table_name)
@@ -36,8 +38,8 @@ class CatboostTrainFlow14(AbstractTrainFlow):
                     join {table_prefix}_requests_features 
                         on {table_prefix}_requests.id = {table_prefix}_requests_features.id
                     join {self.sampling_table_name} a on {table_prefix}_requests.id = a.id and for_test=False
-                    join {self.support_model_scores_table} 
-                        on {self.support_model_scores_table}.id = {table_prefix}_requests.id 
+                    join {support_model_scores_table} 
+                        on {support_model_scores_table}.id = {table_prefix}_requests.id 
                     LIMIT {limit};
                 """
             else:
@@ -48,8 +50,8 @@ class CatboostTrainFlow14(AbstractTrainFlow):
                     FROM {table_prefix}_requests
                     join {table_prefix}_requests_features 
                         on {table_prefix}_requests.id = {table_prefix}_requests_features.id
-                    join {self.support_model_scores_table} 
-                        on {self.support_model_scores_table}.id = {table_prefix}_requests.id                         
+                    join {support_model_scores_table} 
+                        on {support_model_scores_table}.id = {table_prefix}_requests.id                         
                     join {self.sampling_table_name} a on {table_prefix}_requests.id = a.id and for_test=False;
                 """
         else:
@@ -60,8 +62,8 @@ class CatboostTrainFlow14(AbstractTrainFlow):
                     FROM {table_prefix}_requests
                     join {table_prefix}_requests_features 
                         on {table_prefix}_requests.id = {table_prefix}_requests_features.id
-                    join {self.support_model_scores_table}
-                        on {self.support_model_scores_table}.id = {table_prefix}_requests.id                         
+                    join {support_model_scores_table}
+                        on {support_model_scores_table}.id = {table_prefix}_requests.id                         
                     LIMIT {limit};                    
                 """
             else:
@@ -70,8 +72,8 @@ class CatboostTrainFlow14(AbstractTrainFlow):
                     FROM {table_prefix}_requests
                     join {table_prefix}_requests_features 
                         on {table_prefix}_requests.id = {table_prefix}_requests_features.id
-                    join {self.support_model_scores_table}
-                        on {self.support_model_scores_table}.id = {table_prefix}_requests.id                         
+                    join {support_model_scores_table}
+                        on {support_model_scores_table}.id = {table_prefix}_requests.id                         
                 """
 
         train_data = pd.read_sql(select_query, self.db_engine)
@@ -184,11 +186,12 @@ class CatboostTrainFlow14(AbstractTrainFlow):
         from_file_model.load_model(self.model_name)
         self.model = from_file_model
 
-    def apply_model_in_db(self, to_client=False):
+    def apply_model_in_db(self, to_client=False, to_final_test=False):
         assert self.model is not None
         Session = sessionmaker(bind=self.db_engine)
         with Session() as session:
-            table_name = f"{self.model_name}{'_client' if to_client else ''}"
+            suffix = '_client' if to_client else ('_final_test' if to_final_test else '')
+            table_name = f"{self.model_name}{suffix}"
             session.execute(text(f"DROP TABLE if exists {table_name};"))
             session.execute(text(
                 f"""
@@ -201,7 +204,9 @@ class CatboostTrainFlow14(AbstractTrainFlow):
             ))
             logging.info('result table created')
 
-            data = self.prepare_features(table_prefix='client' if to_client else 'agent')
+            table_prefix = 'client' if to_client else ('final_test' if to_final_test else 'agent')
+            logging.info(table_prefix)
+            data = self.prepare_features(table_prefix=table_prefix)
             ids = data.data[['id']]
             predicts = self.model.predict(data.features_frame)
             predict_scores = self.model.predict_proba(data.features_frame)
@@ -217,7 +222,7 @@ class CatboostTrainFlow14(AbstractTrainFlow):
 
             id_with_predict_and_score = list(zip(ids['id'], predicts, predict_scores))
             chunk_size = 10000
-            for chunk in range(0, len(id_with_predict_and_score) // chunk_size + 1):
+            for chunk in range(0, (len(id_with_predict_and_score) // chunk_size) + 1):
                 if chunk * chunk_size < len(id_with_predict_and_score):
                     session.execute(
                         insert(PredictTable),
