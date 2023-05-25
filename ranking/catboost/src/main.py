@@ -4,8 +4,8 @@ import sshtunnel
 from sqlalchemy import create_engine
 
 from model_013_more_days_features import CatboostTrainFlow13 as PrevTrainFlow
-from support_model_002_on_008 import SupportModelCatboost2 as SupportTrainFlow
-from model_013_more_days_features import CatboostTrainFlow13 as TrainFlow
+from support_model_003_on_013 import SupportModelCatboost3 as SupportTrainFlow
+from model_014_with_support_score import CatboostTrainFlow14 as TrainFlow
 logging.getLogger().setLevel(logging.INFO)
 
 
@@ -15,7 +15,7 @@ def learn_on_agent_requests():
     # data = train_flow.prepare_features(filter_for_test=True, limit=50000)
     # train_flow.learn(data)
 
-    data = train_flow.prepare_features(filter_for_test=True)
+    data = train_flow.prepare_features(filter_for_test=False)
     train_flow.learn(data)
     train_flow.save_model()
     # train_flow.load_model()
@@ -27,7 +27,7 @@ def learn_on_client_requests():
     # prev_train_flow.load_model()
     # prev_train_flow.apply_model_in_db(to_client=True)
 
-    # Some sQL from 0014_models_009_and_support_002.sql TODO move to code
+    # Some sQL 0024_models_014_and_support_003.sql TODO move to code
 
     support_train_flow = SupportTrainFlow(db_engine=engine)
     data = support_train_flow.prepare_features(table_prefix='client')  # , limit=30000)
