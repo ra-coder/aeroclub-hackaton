@@ -28,7 +28,7 @@ SELECT agent_requests.id,
        (rank() OVER (
            PARTITION BY requestid
            ORDER BY score DESC
-           ) < 4) as fixed_predict,
+           ) < 6) as fixed_predict,
        sentoption
 from agent_requests
          join model_013 as predict on predict.id = agent_requests.id;
@@ -42,9 +42,9 @@ select
        filter ( where fixed_predict = True and sentoption = True and for_test = True )           as positive_success_count_in_test,
        count(*) filter ( where sentoption = True and for_test = True)                            as sentoption_count_in_test,
        count(*) filter ( where fixed_predict = True and for_test = True)                         as positive_count_in_test,
---        count(*) filter ( where for_test = True )                                                 as all_test_size,
---        count(distinct sample.request_id) filter ( where for_test = True )                        as all_test_requests
-    sum(rank) filter ( where sentoption=True ) as rank_score,
+       count(*) filter ( where for_test = True )                                                 as all_test_size,
+       count(distinct sample.request_id) filter ( where for_test = True )                        as all_test_requests,
+        sum(rank) filter ( where sentoption=True ) as rank_score,
         count(*) filter ( where sentoption = True and fixed_predict = False)                      as sentoption_miss,
        count(*) filter ( where fixed_predict = True and sentoption = True )                      as positive_success_count,
        count(*) filter ( where sentoption = True )                                               as sentoption_count,
