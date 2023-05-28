@@ -1,4 +1,5 @@
 import logging
+from collections import defaultdict
 
 import pandas as pd
 from sqlalchemy import Engine
@@ -26,6 +27,43 @@ class PreparedResult:
     @property
     def target_frame(self):
         return self.data[self.target_column]
+
+    @property
+    def request_id_frame(self):
+        return self.data[['requestid']]
+
+    def make_pairs(self):
+        result = []
+        request_stat = {}
+        for pos, rec in self.data.iterrows():
+            request_stat.setdefault(
+                rec['requestid'],
+                {
+                    'recs_from_sent_flights': {},
+                    'trash_recs': [],
+                }
+            )
+            if rec['sentoption_flight'] is False:
+                request_stat[rec['requestid']]['trash_recs'].append(pos)
+            else:
+                request_stat[rec['requestid']]['recs_from_sent_flights'].setdefault(
+                    rec['fligtoption'],
+                    defaultdict(list),
+                )
+                variants = request_stat[rec['requestid']]['recs_from_sent_flights'][rec['fligtoption']]
+                if rec['sentoption_fixed'] is True:
+                    variants['sentoption'].append(pos)
+                else:
+                    variants['miss'].append(pos)
+        import pprint
+        for request_info in request_stat.values():
+            for sentoption_flight_info in request_info['recs_from_sent_flights'].values():
+                for win_pos in sentoption_flight_info.get('sentoption', []) :
+                    for loos_pos in sentoption_flight_info.get('miss', []):
+                        result.append([win_pos, loos_pos])
+                    for trash_pos in request_info['trash_recs']:
+                        result.append([win_pos, trash_pos])
+        return result
 
 
 class AbstractTrainFlow:
