@@ -13,7 +13,7 @@ from ranking.catboost.src.lib import AbstractTrainFlow, PreparedResult
 
 
 class CatboostTrainFlow16(AbstractTrainFlow):
-    model_name = 'model_016_pair_logit_1100'
+    model_name = 'model_016_pair_logit_2000'
 
     def prepare_features(
             self,
@@ -157,9 +157,9 @@ class CatboostTrainFlow16(AbstractTrainFlow):
         # )
         # Prepare model
         model = CatBoostRanker(
-            iterations=1100,
+            iterations=2000,
             loss_function='PairLogit',
-            #loss_function='YetiRank',  # 'MultiClass',  # MultiLogloss ???
+            # loss_function='YetiRank',  # 'MultiClass',  # MultiLogloss ???
             verbose=True,
             cat_features=prepared_data.text_features,
         )
@@ -175,7 +175,7 @@ class CatboostTrainFlow16(AbstractTrainFlow):
         model.fit(
             pool,
             verbose=True,
-            eval_set=pool,
+            # eval_set=pool,
         )
         self.model = model
         # pred = model.predict(X_test)
@@ -192,11 +192,12 @@ class CatboostTrainFlow16(AbstractTrainFlow):
         from_file_model.load_model(self.model_name)
         self.model = from_file_model
 
-    def apply_model_in_db(self, to_client=False):
+    def apply_model_in_db(self, to_client=False, to_final_test=False):
         assert self.model is not None
         Session = sessionmaker(bind=self.db_engine)
         with Session() as session:
-            table_name = f"{self.model_name}{'_client' if to_client else ''}"
+            suffix = '_client' if to_client else ('_final_test' if to_final_test else '')
+            table_name = f"{self.model_name}{suffix}"
             session.execute(text(f"DROP TABLE if exists {table_name};"))
             session.execute(text(
                 f"""
@@ -209,7 +210,9 @@ class CatboostTrainFlow16(AbstractTrainFlow):
             ))
             logging.info('result table created')
 
-            data = self.prepare_features(table_prefix='client' if to_client else 'agent')
+            table_prefix = 'client' if to_client else ('final_test' if to_final_test else 'agent')
+            logging.info(table_prefix)
+            data = self.prepare_features(table_prefix=table_prefix)
             ids = data.data[['id']]
             predicts = self.model.predict(data.features_frame)
             # predict_scores = self.model.predict(data.features_frame)
@@ -241,10 +244,7 @@ class CatboostTrainFlow16(AbstractTrainFlow):
 
 """
 
-699:	learn: 0.0903518	test: 0.0903518	best: 0.0903518 (699)	total: 25m 38s	remaining: 0us
-
-bestTest = 0.09035181949
-bestIteration = 699
+1999:	learn: 0.0553557	total: 58m 24s	remaining: 0us
 
 ---700
 test_rank_score,best_rank_score,f_test_rank_score,f_best_rank_score
@@ -266,6 +266,13 @@ accuracy,,,,41764
 
 
 ---1100
+
+1099:	learn: 0.0733926	test: 0.0733926	best: 0.0733926 (1099)	total: 34m 32s	remaining: 0us
+
+bestTest = 0.07339263282
+bestIteration = 1099
+
+
 test_rank_score,best_rank_score,f_test_rank_score,f_best_rank_score
 11428,3930,11848,5159
 
@@ -291,6 +298,32 @@ on fixed predict
 class,pricission,recall,f1_score,support
 True,0.422,0.740,0.538,3641
 False,0.986,0.947,0.966,38123
+accuracy,,,,41764
+
+---2000
+test_rank_score,best_rank_score,f_test_rank_score,f_best_rank_score
+11746,3930,11767,5159
+
+f_sentoption_miss_test,f_positive_success_count_in_test,f_sentoption_count_in_test,f_positive_count_in_test,all_test_size,all_test_requests
+539,1538,2077,3643,41764,774
+
+sentoption_miss_test,positive_success_count_in_test,sentoption_count_in_test,positive_count_in_test
+512,1339,1851,3643
+
+rank_score,sentoption_miss,positive_success_count,sentoption_count,positive_count
+120947,5289,19719,25008,47690
+
+on predict 
+class,pricission,recall,f1_score,support
+True,0.368,0.723,0.487,3643
+False,0.987,0.942,0.964,38121
+accuracy,,,,41764
+
+
+on fixed predict 
+class,pricission,recall,f1_score,support
+True,0.422,0.740,0.538,3643
+False,0.986,0.947,0.966,38121
 accuracy,,,,41764
 
 

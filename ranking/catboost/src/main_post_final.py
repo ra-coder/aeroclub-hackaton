@@ -65,6 +65,6 @@ if __name__ == '__main__':
 
         # learn_on_client_requests()
 
-        learn_on_agent_requests()
+        # learn_on_agent_requests()
 
-        # apply_to_final_test_requests()
+        apply_to_final_test_requests()

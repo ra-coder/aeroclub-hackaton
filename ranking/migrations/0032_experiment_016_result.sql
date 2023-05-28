@@ -14,6 +14,7 @@ create table postprocess_model_016
 );
 create index on postprocess_model_016 (id);
 
+
 insert into postprocess_model_016 (id, request_id, predict, score, rank,  sentoption_rank, sentoption_fixed_rank,
                                    fixed_predict, sentoption, sentoption_fixed)
 SELECT agent_requests.id,
@@ -26,11 +27,11 @@ SELECT agent_requests.id,
            ),
        rank() OVER (
            PARTITION BY requestid
-           ORDER BY (sentoption, predict.id) DESC
+           ORDER BY (sentoption, score, predict.id) DESC
            ) as sentoption_rank,
        rank() OVER (
            PARTITION BY requestid
-           ORDER BY (sentoption_fixed, predict.id) DESC
+           ORDER BY (sentoption_fixed, score, predict.id) DESC
            ) as sentoption_fixed_rank,
        (rank() OVER (
            PARTITION BY requestid
@@ -39,7 +40,8 @@ SELECT agent_requests.id,
        sentoption,
        sentoption_fixed
 from agent_requests
-         join model_016_pair_logit_1100 as predict on predict.id = agent_requests.id;
+         join model_016_pair_logit_2000 as predict on predict.id = agent_requests.id;
+
 
 select
     sum(rank) filter ( where sentoption=True and for_test = True ) as test_rank_score,
